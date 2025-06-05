@@ -53,7 +53,7 @@ This database schema is implemented using Entity Framework Core with PostgreSQL,
 
 ```bash
 # Clone and navigate to project
-git clone <repository-url>
+git clone https://github.com/zayedu/LaunchTrace.git
 cd LaunchTrace
 
 # Start services (database + API)
