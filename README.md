@@ -1,6 +1,6 @@
-# LaunchTrace - SpaceX Parts Management System
+# TraceX
 
-A full-stack application for tracking rocket parts and builds, designed as a SpaceX interview preparation project.
+A full-stack application for tracking rocket parts and builds.
 
 ## Architecture
 
