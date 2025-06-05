@@ -17,7 +17,7 @@ import { MatTabsModule } from "@angular/material/tabs";
   ],
   template: `
     <mat-toolbar color="primary">
-      <span>🚀 LaunchTrace - SpaceX Management System</span>
+      <span>TraceX</span>
       <span class="spacer"></span>
       <nav>
         <a mat-button routerLink="/parts" routerLinkActive="active-link">
