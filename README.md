@@ -24,6 +24,15 @@ A full-stack application for tracking rocket parts and builds, designed as a Spa
 - **Containerization**: Docker & Docker Compose
 - **CI/CD**: GitHub Actions
 
+## Database Schema / ER Diagram
+
+![ER Diagram](assets/SchemaERDiagram.png)
+This database schema is implemented using Entity Framework Core with PostgreSQL,and seeded with file [`seed_data_int.sql`](seed_data_int.sql). It includes:
+
+- **Suppliers**: 30 suppliers providing parts
+- **Parts**: 1,500 parts with statuses (90% OK, 10% FAULTY)
+- **Builds**: 200 rocket builds with random dates (last 365 days)
+
 ## Domain Models
 
 - **Supplier**: Company providing parts
@@ -40,7 +49,7 @@ A full-stack application for tracking rocket parts and builds, designed as a Spa
 - Docker & Docker Compose
 - Angular CLI (`npm install -g @angular/cli`)
 
-### Option 1: Docker Compose (Recommended)
+### Docker Compose
 
 ```bash
 # Clone and navigate to project
@@ -52,24 +61,6 @@ docker-compose up -d
 
 # The API will be available at http://localhost:5029
 # Database will be seeded automatically with sample data
-```
-
-### Option 2: Local Development
-
-```bash
-# 1. Start PostgreSQL
-docker run --name postgres-launchtrace -e POSTGRES_DB=launchtrace -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres:16
-
-# 2. Restore .NET packages and run API
-dotnet restore
-dotnet run --project LaunchTrace/LaunchTrace.csproj
-
-# 3. In another terminal, start Angular frontend
-cd launchtrace-ui
-npm install
-ng serve
-
-# Access the application at http://localhost:4200
 ```
 
 ### Database Setup
@@ -87,19 +78,93 @@ docker exec -i postgres-launchtrace psql -U postgres -d launchtrace < seed_data_
 
 ## API Endpoints
 
-| Method | Endpoint                        | Description                      |
-| ------ | ------------------------------- | -------------------------------- |
-| GET    | `/api/parts?skip={}&take={}`    | Get paginated parts list         |
-| POST   | `/api/parts/{id}/flagFaulty`    | Mark part as faulty              |
-| GET    | `/api/impacted-builds/{partId}` | Get builds using a specific part |
+### Parts Management
+
+| Method | Endpoint                        | Description                             |
+| ------ | ------------------------------- | --------------------------------------- |
+| GET    | `/api/parts?skip={}&take={}`    | Get paginated parts list with suppliers |
+| POST   | `/api/parts/{id}/flagFaulty`    | Mark part as faulty                     |
+| GET    | `/api/impacted-builds/{partId}` | Get builds using a specific part        |
+
+### Builds Management
+
+| Method | Endpoint                      | Description                                     |
+| ------ | ----------------------------- | ----------------------------------------------- |
+| GET    | `/api/builds?skip={}&take={}` | Get paginated builds list with part counts      |
+| GET    | `/api/builds/{id}`            | Get detailed build with all parts and suppliers |
+| POST   | `/api/builds`                 | Create new build with part assignments          |
+
+### Example API Responses
+
+**GET /api/parts**
+
+```json
+{
+  "total": 1500,
+  "items": [
+    {
+      "partId": 1,
+      "name": "Engine Nozzle",
+      "status": "OK",
+      "supplierId": 1,
+      "supplier": {
+        "supplierId": 1,
+        "name": "Rocket Parts Inc"
+      }
+    }
+  ]
+}
+```
+
+**GET /api/builds**
+
+```json
+{
+  "total": 202,
+  "items": [
+    {
+      "buildId": 1,
+      "serialNumber": "FALCON-001",
+      "buildDate": "2024-12-15T10:30:00Z",
+      "partCount": 8,
+      "faultyPartCount": 1
+    }
+  ]
+}
+```
+
+**POST /api/builds** (Request Body)
+
+```json
+{
+  "serialNumber": "STARSHIP-042",
+  "buildDate": "2024-12-20T14:00:00Z",
+  "partIds": [1, 5, 10, 15, 22]
+}
+```
 
 ## Frontend Features
 
+### Parts Management
+
 - **Parts Table**: Paginated table with filtering (All/OK/FAULTY)
 - **Flag Faulty**: Button to mark parts as defective
-- **Builds Dialog**: Placeholder for viewing impacted builds
+- **Impacted Builds**: View builds affected by specific parts
+- **Supplier Information**: Display part suppliers in table
+
+### Builds Management
+
+- **Builds Table**: Paginated table showing all spacecraft builds
+- **Build Details**: Detailed view with all parts and their statuses
+- **Part Count Tracking**: Display total parts and faulty parts per build
+- **Create Builds**: Interface to create new builds with part assignments
+
+### UI/UX Features
+
+- **Tabbed Navigation**: Switch between Parts and Builds management
 - **Loading States**: Spinner during API calls
 - **Responsive Design**: Material Design components
+- **Status Indicators**: Visual indicators for part and build statuses
 
 ## Testing
 
@@ -108,18 +173,14 @@ docker exec -i postgres-launchtrace psql -U postgres -d launchtrace < seed_data_
 dotnet test
 
 # The tests use WebApplicationFactory to verify:
-# 1. GET /api/parts returns data
-# 2. POST /api/parts/{id}/flagFaulty toggles status
-```
-
-## Database Schema
-
-```sql
--- Sample data includes:
--- 30 suppliers
--- 1,500 parts (90% OK, 10% FAULTY)
--- 200 builds with random dates (last 365 days)
--- Each build has 2-10 random parts with quantities 1-4
+# Parts Management:
+# 1. GET /api/parts returns paginated data with suppliers
+# 2. POST /api/parts/{id}/flagFaulty toggles part status
+#
+# Builds Management:
+# 3. GET /api/builds returns builds with part counts
+# 4. GET /api/builds/{id} returns detailed build with parts
+# 5. POST /api/builds creates new builds with part assignments
 ```
 
 ## Development Commands
@@ -159,15 +220,3 @@ LaunchTrace/
 ├── seed_data_int.sql               # Database seed script
 └── .github/workflows/ci.yml        # CI pipeline
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make changes and add tests
-4. Run `dotnet test` and `ng test`
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details.
