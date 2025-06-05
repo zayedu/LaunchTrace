@@ -1,0 +1,6 @@
+@LaunchTrace_HostAddress = http://localhost:5276
+
+GET {{LaunchTrace_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
