@@ -10,6 +10,8 @@ namespace LaunchTrace.Tests;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
+    private readonly string _databaseName = $"TestDb_{Guid.NewGuid()}";
+    
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -20,7 +22,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
             // Add in-memory database for testing
             services.AddDbContext<LaunchTraceDbContext>(options =>
-                options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}"));
+                options.UseInMemoryDatabase(_databaseName));
         });
 
         builder.UseEnvironment("Testing");
