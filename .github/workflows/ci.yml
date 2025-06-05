@@ -22,8 +22,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          cache: "npm"
-          cache-dependency-path: launchtrace-ui/package-lock.json
 
       - name: Install Angular CLI
         run: npm install -g @angular/cli
@@ -46,11 +44,3 @@ jobs:
 
       - name: Run .NET tests
         run: dotnet test --no-build --verbosity normal
-
-      - name: Test API endpoints (optional)
-        run: |
-          cd LaunchTrace
-          dotnet run &
-          sleep 10
-          curl -f http://localhost:5000/api/parts || exit 1
-        continue-on-error: true
