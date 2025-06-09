@@ -2,6 +2,14 @@
 
 A full-stack application for tracking rocket parts and builds.
 
+## Demo
+
+<p align="center">
+  <a href="https://youtu.be/VRUBsR8lc-8">
+    <img src="https://img.youtube.com/vi/VRUBsR8lc-8/0.jpg" alt="Watch the demo" />
+  </a>
+</p>
+
 ## Architecture
 
 ```
